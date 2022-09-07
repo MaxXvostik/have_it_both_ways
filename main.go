@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -15,6 +16,9 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("Посчитать зарплату")
 	w.Resize(fyne.NewSize(500, 600))
+
+	//Создание темной темы
+	a.Settings().SetTheme(theme.DarkTheme())
 
 	//оклад
 	label1 := widget.NewLabel("Введи оклад")
@@ -41,7 +45,8 @@ func main() {
 	entry6 := widget.NewEntry()
 
 	//сумма
-	answer := widget.NewLabel("")
+	answer_dirty := widget.NewLabel("")
+	answer_4ist := widget.NewLabel("")
 
 	btn := widget.NewButton("Посчитать", func() {
 
@@ -58,7 +63,7 @@ func main() {
 		num6, err6 := strconv.ParseFloat(entry6.Text, 64)
 
 		if err1 != nil || err2 != nil || err3 != nil || err4 != nil || err5 != nil || err6 != nil {
-			answer.SetText("Ошибка ввода")
+			answer_dirty.SetText("Ошибка ввода")
 		} else {
 
 			//Стоимость часа
@@ -74,12 +79,16 @@ func main() {
 			coefficient_1_5 := (cost_per_hour * num6) * 1.5
 
 			//Премия
-			prize := num1 * (num3 / 100)
+			prize := cost_per_hour * (num4 * (num3 / 100))
 
-			//Сумма
-			sum := (coefficient_1 + coefficient_1_3 + coefficient_1_5 + prize) * 0.87
+			//Сумма грязными
+			sum_dirty := (coefficient_1 + coefficient_1_3 + coefficient_1_5 + prize)
+			answer_dirty.SetText(fmt.Sprintf("%.2f      Сумма без вычета", sum_dirty))
 
-			answer.SetText(fmt.Sprintf("%.2f", sum))
+			//Сумма чистыми
+			sum_4ist := (coefficient_1 + coefficient_1_3 + coefficient_1_5 + prize) * 0.87
+			answer_4ist.SetText(fmt.Sprintf("%.2f      Сумма чистыми", sum_4ist))
+
 		}
 	})
 
@@ -97,7 +106,8 @@ func main() {
 		label6,
 		entry6,
 		btn,
-		answer,
+		answer_dirty,
+		answer_4ist,
 	))
 
 	w.ShowAndRun()
